@@ -54,7 +54,7 @@ function relatorio() {
         function listarcli() {
             dadosrl.innerHTML = 'Relatório de Cadastro de Clientes'
             for (let cliente of clientes) {
-                dadosrl.innerHTML += `<p><br>${i++}º => Nome do Cliente: ${cliente.nome}   ||   CPF: ${cliente.cpf}</p>`
+                dadosrl.innerHTML += `<p><br>${i++}º => Nome do Cliente: ${cliente.nome}   ||   CPF: ${cliente.cpfoucnpj}</p>`
             }
         }
         listarcli()
@@ -220,7 +220,7 @@ function alterarcl() {
 
 }
 function clidelete() {
-    let ind = clientes.findIndex(cliente => cliente.cpf === cpf.value);
+    let ind = clientes.findIndex(cliente => cliente.cpfoucnpj === cpf.value);
     if (ind !== -1) {
         clientes.splice(ind, 1);
         localStorage.setItem("clientes", JSON.stringify(clientes));
@@ -359,3 +359,12 @@ function xyz() {
         alert("Impossível Vender Valor negativo!")
     }
 }
+
+async function buscar_cliente() {
+    const busca = await fetch('http://localhost:3000/cliente')
+    const dados = await busca.json()
+    clientes.lenght = 0
+    clientes.push(...dados)
+    listarcli()
+}
+buscar_cliente()

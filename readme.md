@@ -75,7 +75,55 @@ git push origin main
 
 
 
-
+git remote add origin https://github.com/JoelGSN/com_backend.git
 git remote add origin https://github.com/JoelGSN/newlojamoveis.git
 git pull origin main --rebase
 git push origin main   
+
+
+
+
+rotas api
+
+# --- CLIENTES ---
+GET http://localhost:3000/cliente
+GET http://localhost:3000/cliente/:cpfoucnpj
+POST http://localhost:3000/cliente
+PUT http://localhost:3000/cliente/:cpfoucnpj
+DELETE http://localhost:3000/cliente/:cpfoucnpj
+
+# --- PRODUTOS ---
+GET http://localhost:3000/produto
+GET http://localhost:3000/produto/:produto
+POST http://localhost:3000/produto
+PUT http://localhost:3000/produto/:produto
+POST http://localhost:3000/produto/produto/comprar
+POST http://localhost:3000/produto/produto/vender
+DELETE http://localhost:3000/produto/produto/vender
+
+# --- EXEMPLOS COM DADOS PREENCHIDOS ---
+GET http://localhost:3000/cliente/12345678901
+GET http://localhost:3000/produto/Cadeira
+POST http://localhost:3000/produto/Cadeira/comprar
+POST http://localhost:3000/produto/Cadeira/vender
+
+# clientes modelo do JSON
+
+  {
+    "nome": "João da Silva",
+    "cpfoucnpj": "12345678900",
+    "rua": "Rua das Flores",
+    "numero": 123,
+    "uf": "MG"
+  }
+
+
+  # produtos modelo do JSON
+
+    {
+    "produto": "Camiseta Básica",
+    "tipo": "Vestuário",
+    "cor": "Preto",
+    "quantidade": 50,
+    "preco": 49.9
+  }
