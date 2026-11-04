@@ -3,14 +3,10 @@ import { Router } from 'express'
 
 const router = Router()
 
-router.get('/', cliente_controllers.listar )
-
-router.get('/:id', cliente_controllers.buscarid )
-
+router.get('/', cliente_controllers.listar)
+router.get('/:cpfoucnpj', cliente_controllers.buscarPorCpfOuCnpj)
 router.post('/', cliente_controllers.cadastrar)
-
-router.delete('/:id', cliente_controllers.remover)
-
-router.put('/:id', cliente_controllers.atualizar)
+router.delete('/:cpfoucnpj', cliente_controllers.remover)
+router.put('/:cpfoucnpj', cliente_controllers.atualizar)
 
 export default router

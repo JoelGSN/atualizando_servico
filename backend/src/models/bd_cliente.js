@@ -12,7 +12,7 @@ const cad_cliente = sequelize.define('cliente', {
         allowNull: false
     },
     cpfoucnpj: {
-        type: DataTypes.STRING(14), 
+        type: DataTypes.STRING(20), 
         allowNull: false
     },
     rua: {
@@ -21,10 +21,6 @@ const cad_cliente = sequelize.define('cliente', {
     },
     numero: {
         type: DataTypes.INTEGER,
-        allowNull: false
-    },
-    cidade: {
-        type: DataTypes.STRING,
         allowNull: false
     },
     uf: {

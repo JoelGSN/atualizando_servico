@@ -88,7 +88,7 @@ relatorio()
 //PARTE DO INNER FIM
 //ABA DE RELATÓRIOS FIM
 //ABA DE CLIENTES INICIO
-function cli() {
+async function cli() {
     if (nomec.value.trim() && cpf.value.trim() && rua.value.trim() && numero.value.trim() && uf.value.trim) {
         if (/^[A-Za-zÁ-ý\s]+$/.test(nomec.value)) {
             if (/^\d{11}$/.test(cpf.value)) {
@@ -106,7 +106,14 @@ function cli() {
                         uf: uf.value
                     }
                     clientes.push(cliente)
+
+                    await fetch('http://localhost:3000/cliente',{
+                        method: 'POST',
+                        headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify(cliente)
+                    })
                     localStorage.setItem("clientes", JSON.stringify(clientes))
+
                     alert("Cadastro Efetuado com Sucesso!!")
                 } else alert("Cliente já foi cadastrado!")
             } else alert("deve conter apenas 11 digitos caso for CPF ou 14 digitos caso for CNPJ")
@@ -122,7 +129,7 @@ function cli() {
 // }
 //ABA DE CLIENTES FIM
 //ABA DE PRODUTOS INICIO
-function pro() {
+async function pro() {
     // console.log("testando")
     if (nomep.value.trim() &&
         tipo.value.trim() &&
@@ -145,6 +152,13 @@ function pro() {
                         quantidade: quantidade.value
                     }
                     produtos.push(produto)
+
+                    await fetch('http://localhost:3000/produto',{
+                        method: 'POST',
+                        headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify(produto)
+                    })
+                    
                     localStorage.setItem("produtos", JSON.stringify(produtos))
                     alert("Produto Cadastrado com sucesso!")
                 } else alert("Produto ja Cadastrado!")
@@ -243,39 +257,105 @@ function comprapd() {
     }
 }
 function venderpd() {
+
+
+
+
     let existe = false;
-    let vlrsoma = qtdcv.value
+    let vlrsoma = Number(qtdcv.value)
     let qtd_novo = 0;
     if (vlrsoma > 0) {
-        if (produto.quantidade > vlrsoma) {
-            for (let produto of produtos) {
-                if (produto.nome === nmcv.value) {
-                    existe = true;
-                    produto.quantidade = produto.quantidade - vlrsoma
+        for (let produto of produtos) {
+            if (produto.nome === nmcv.value) {
+                existe = true;
+                if (produto.quantidade > vlrsoma) {
+
+                produto.quantidade = produto.quantidade - vlrsoma
+                qtd_novo = produto.quantidade;
+                break;
+
+                } else {
+                    alert("Quantidade Indisponível para venda")
+                    return;
+                }
+                
+                //
+            }
+        }
+        if (existe) {
+            const venda = {
+                nome: nomev.value,
+                quantidade: quantidadev.value
+            }
+            vendas.push(venda)
+            localStorage.setItem("vendas", JSON.stringify(vendas))
+            localStorage.setItem("produtos", JSON.stringify(produtos));
+            // alert("Alterado de "+qtd_antiga+" para "+ idpd.value+" ou "+produto.quantidade);
+            alert("Venda Executada!! Novo Estoque: " + qtd_novo);
+        } else {
+            alert("Produto não encontrado!");
+        }
+
+    } else {
+        alert("Impossível Vender Valor negativo!")
+    }
+
+
+
+
+
+}
+//Movimentação Produtos FIM
+//FUNÇÕES GERAIS FIM
+
+
+function xyz() {
+    let existe = false;
+    let vlrsoma = Number(qtdcv.value)
+    let qtd_novo = 0;
+
+    if (nmcv.value == "" || qtdcv.value == "") {
+        alert("Preencher devidamente os campos!!")
+        return
+    }
+    if (vlrsoma > 0) {
+
+
+
+
+
+
+        for (let produto of produtos) {
+            if (produto.nome === nmcv.value) {
+                existe = true;
+                if (produto.quantidade > vlrsoma) {
+
+                    produto.quantidade = Number(produto.quantidade) - vlrsoma
                     qtd_novo = produto.quantidade;
                     break;
-                    //
+                } else {
+                    alert("Quantidade Indisponível para venda")
                 }
             }
-            if (existe) {
-                const venda = {
-                    nome: nomev.value,
-                    quantidade: quantidadev.value
-                }
-                vendas.push(venda)
-                localStorage.setItem("vendas", JSON.stringify(vendas))
-                localStorage.setItem("produtos", JSON.stringify(produtos));
-                // alert("Alterado de "+qtd_antiga+" para "+ idpd.value+" ou "+produto.quantidade);
-                alert("Venda Executada!! Novo Estoque: " + qtd_novo);
-            } else {
-                alert("Produto não encontrado!");
+        }
+        if (existe) {
+            // if (produto.quantidade > vlrsoma) {
+            const venda = {
+                nome: nomev.value,
+                quantidade: quantidadev.value
             }
+            vendas.push(venda)
+            localStorage.setItem("vendas", JSON.stringify(vendas))
+            localStorage.setItem("produtos", JSON.stringify(produtos));
+            // alert("Alterado de "+qtd_antiga+" para "+ idpd.value+" ou "+produto.quantidade);
+            alert("Venda Executada!! Novo Estoque: " + qtd_novo);
+            // } else {
+            //     alert("Quantidade Indisponível para venda")
+            // }
         } else {
-            alert("Quantidade Indisponível para venda")
+            alert("Produto não encontrado!");
         }
     } else {
         alert("Impossível Vender Valor negativo!")
     }
 }
-//Movimentação Produtos FIM
-//FUNÇÕES GERAIS FIM

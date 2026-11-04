@@ -3,21 +3,15 @@ import { Router } from 'express'
 
 const router = Router()
 
-router.get('/', prod_controllers.listar )
-
-router.get('/:id', prod_controllers.buscarid )
-
+router.get('/', prod_controllers.listar)
+router.get('/:produto', prod_controllers.buscarPorNome)
 router.post('/', prod_controllers.cadastrar)
+router.delete('/:produto', prod_controllers.remover)
+router.put('/:produto', prod_controllers.atualizar)
 
-router.delete('/:id', prod_controllers.remover)
-
-router.put('/:id', prod_controllers.atualizar)
-
-
-//comprar
-router.post('/:id/comprar', prod_controllers.comprar)
-//vender
-router.post('/:id/vender', prod_controllers.vender)
-
+// Comprar
+router.post('/:produto/comprar', prod_controllers.comprar)
+// Vender
+router.post('/:produto/vender', prod_controllers.vender)
 
 export default router
