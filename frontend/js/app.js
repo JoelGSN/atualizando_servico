@@ -30,7 +30,7 @@ const nomev = document.getElementById("nomecv")
 const quantidadev = document.getElementById("quantidadecv")
 
 buscar_cliente()
-// buscar_produto()
+buscar_produto()
 
 //ABA DE RELATÓRIOS INICIO
 //PARTE DOS BOTÕES INICIO
@@ -166,7 +166,7 @@ async function pro() {
             if (quantidade.value >= 0) {
                 let existe = false
                 for (let p of produtos) {
-                    if (p.nome == nomep.value)
+                    if (p.produto == nomep.value)
                         existe = true
                 }
                 if (!existe) {

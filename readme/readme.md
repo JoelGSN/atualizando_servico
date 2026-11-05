@@ -128,3 +128,49 @@ POST http://localhost:3000/produto/Cadeira/vender
     "quantidade": 50,
     "preco": 49.9
   }
+
+
+
+  O seu cadastro de produtos não alimentava o banco e não recebia ID por conta de 4 divergências entre o frontend e o backend:
+
+1. Por que NÃO estava alimentando o banco de dados?
+Incompatibilidade de nomes (nome vs produto):
+No banco de dados SQLite e no Model (bd_produto.js), a coluna foi criada como produto e com a regra obrigatória allowNull: false.
+No frontend (app.js), o formulário enviava o campo como nome:
+javascript
+const produto = { nome: nomep.value, ... }
+No serviço do backend (produtoService.js), ele tentava executar:
+javascript
+bd_produto.create({ nome, tipo, cor, quantidade, preco })
+Como o Model não possui nome e o campo produto não podia ser nulo, o Sequelize lançava o erro notNull Violation: produto.produto cannot be null e a requisição quebrava com Erro 500 (Internal Server Error) sem gravar nada na tabela.
+
+
+2. Por que NÃO puxava o ID como o cadastro de clientes faz?
+A busca inicial de produtos estava comentada:
+Na linha 33 do app.js, você chamava buscar_cliente(), mas // buscar_produto() estava comentada.
+Erro de digitação em buscar_produto:
+Na linha 336 do app.js, estava escrito produtos.lenght = 0 (com ht em vez de length).
+Quem gera o ID é o banco SQLite (AUTOINCREMENT):
+No seu código anterior, a função pro() dava produtos.push(produto) com o objeto digitado no formulário (que ainda não tinha id).
+Para ter o ID na hora, precisamos capturar o JSON devolvido pelo backend após o salvamento:
+javascript
+const resposta = await fetch('http://localhost:3000/produto', { ... })
+const produtoSalvo = await resposta.json() // <-- Já vem com o ID gerado pelo banco!
+produtos.push(produtoSalvo)
+
+
+3. Outros erros corrigidos no Backend
+Em produto_controllers.js:
+A função buscarcPornome chamava produtoService.buscarcPorId (uma função que não existia no service, quebrando a rota GET /produto/:produto). Foi corrigido para chamar buscarcPornome.
+Em produtoService.js:
+Nas funções venderproduto e comprarproduto, estava nmproduto.quantidade (sendo que nmproduto era a string com o nome vindo da URL). Foi corrigido para produtovar.quantidade.
+Agora o service aceita tanto produto quanto nome de forma flexível:
+javascript
+const nomeProduto = dados.produto || dados.nome
+🚀 Como testar agora:
+Abra um terminal na pasta do backend e inicie o servidor:
+powershell
+cd "g:\VSCode_Trabalhos\frontend\Aula_8_1semana\final_lojamoveis\atualizando_servico\backend"
+node src/server.js
+Abra a página produto.html, cadastre um produto e você verá o alerta confirmando o ID gerado automaticamente pelo banco SQLite.
+Na aba relatorio.html, ao clicar em "Cadastro Produtos", o produto aparecerá com seu [ID: 1] e todos os dados sincronizados!
