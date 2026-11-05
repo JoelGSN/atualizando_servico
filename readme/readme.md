@@ -77,6 +77,7 @@ git push origin main
 
 git remote add origin https://github.com/JoelGSN/com_backend.git
 git remote add origin https://github.com/JoelGSN/newlojamoveis.git
+git remote add origin https://github.com/JoelGSN/atualizando_servico.git
 git pull origin main --rebase
 git push origin main   
 

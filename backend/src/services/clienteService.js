@@ -6,14 +6,6 @@ export async function listarcliente() {
 }
 
 
-/* export async function buscarcPorId(cpfoucnpj) {
-    return await bd_cliente.findOne({
-        where: {
-            cpfoucnpj
-        }
-    })
-} */
-
     
 export async function buscarcPordoc(cpfoucnpj) {
     return await bd_cliente.findOne({

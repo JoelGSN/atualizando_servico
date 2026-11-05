@@ -30,7 +30,7 @@ const nomev = document.getElementById("nomecv")
 const quantidadev = document.getElementById("quantidadecv")
 
 buscar_cliente()
-buscar_produto()
+// buscar_produto()
 
 //ABA DE RELATÓRIOS INICIO
 //PARTE DOS BOTÕES INICIO
@@ -93,11 +93,12 @@ function relatorio() {
 //ABA DE CLIENTES INICIO
 async function cli() {
     if (nomec.value.trim() && cpf.value.trim() && rua.value.trim() && numero.value.trim() && uf.value.trim) {
+
         if (/^[A-Za-zÁ-ý\s]+$/.test(nomec.value)) {
             if (/^\d{11}$/.test(cpf.value) || /^\d{14}$/.test(cpf.value) || /^\d{18}$/.test(cpf.value)) {
                 let existe = false
                 for (let cliente of clientes) {
-                    if (cliente.cpf == cpf.value)
+                    if (cliente.cpfoucnpj == cpf.value)
                         existe = true
                 }
                 if (!existe) {
@@ -108,7 +109,14 @@ async function cli() {
                         numero: numero.value,
                         uf: uf.value
                     }
-                    clientes.push(cliente)
+
+                    // let existe2 = false
+
+                    // const c = await clientes.find(item => item.cpfoucnpj === cpf.value)
+                    // if(c){
+                    //     existe2 = true
+                    // }
+                    // if(!existe2){
 
                     await fetch('http://localhost:3000/cliente', {
                         method: 'POST',
@@ -116,14 +124,28 @@ async function cli() {
                         body: JSON.stringify(cliente)
                     })
 
+                    clientes.push(cliente)
                     localStorage.setItem("clientes", JSON.stringify(clientes))
-
                     alert("Cadastro Efetuado com Sucesso!!")
-                } else alert("Cliente já foi cadastrado!")
-            } else alert("deve conter apenas 11 digitos caso for CPF ou 14 digitos caso for CNPJ")
-        } else alert("Nome so Aceita Letras , acentos e Espaço!")
-    } else alert("Preencha todos os campos!")
-    listar()
+
+                    // }else{
+                    //     alert("Cliente já foi cadastrado!")
+
+                    // }
+
+                } else {
+                    alert("Cliente já foi cadastrado!")
+                }
+            } else {
+                alert("deve conter apenas 11 digitos caso for CPF ou 14 digitos caso for CNPJ")
+            }
+        } else {
+            alert("Nome so Aceita Letras , acentos e Espaço!")
+        }
+    } else {
+        alert("Preencha todos os campos!")
+    }
+    listarcli()
 }
 // function listarcl() {
 //     dadoscl.innerHTML = '<== Cadastrados ==>'
@@ -149,7 +171,7 @@ async function pro() {
                 }
                 if (!existe) {
                     const produto = {
-                        nome: nomep.value,
+                        produto: nomep.value,
                         tipo: tipo.value,
                         cor: cor.value,
                         preco: preco.value,
@@ -171,22 +193,7 @@ async function pro() {
     } else alert("Preencha todos os campos do produto")
     // listar()
 }
-// function listarpd() {
-//     dadospd.innerHTML = '<== Cadastrados ==>'
-//     for (let produto of produtos) {
-//         dadospd.innerHTML += `<p>Produto: ${produto.nome} || Quantidade: ${produto.quantidade}</p>`
-//     }
-// }
-//ABA DE PRODUTOS FIM
-//FUNÇÕES GERAIS INICIO
-// function listar() {
-//     if (uf) {
-//         listarcl()
-//     } else {
-//         listarpd()
-//     }
-// }
-// listar();
+
 //Movimentação Clientes inicio
 function buscliente() {
     let existe = false
@@ -313,56 +320,7 @@ function venderpd() {
 //FUNÇÕES GERAIS FIM
 
 
-function xyz() {
-    let existe = false;
-    let vlrsoma = Number(qtdcv.value)
-    let qtd_novo = 0;
 
-    if (nmcv.value == "" || qtdcv.value == "") {
-        alert("Preencher devidamente os campos!!")
-        return
-    }
-    if (vlrsoma > 0) {
-
-
-
-
-
-
-        for (let produto of produtos) {
-            if (produto.nome === nmcv.value) {
-                existe = true;
-                if (produto.quantidade > vlrsoma) {
-
-                    produto.quantidade = Number(produto.quantidade) - vlrsoma
-                    qtd_novo = produto.quantidade;
-                    break;
-                } else {
-                    alert("Quantidade Indisponível para venda")
-                }
-            }
-        }
-        if (existe) {
-            // if (produto.quantidade > vlrsoma) {
-            const venda = {
-                nome: nomev.value,
-                quantidade: quantidadev.value
-            }
-            vendas.push(venda)
-            localStorage.setItem("vendas", JSON.stringify(vendas))
-            localStorage.setItem("produtos", JSON.stringify(produtos));
-            // alert("Alterado de "+qtd_antiga+" para "+ idpd.value+" ou "+produto.quantidade);
-            alert("Venda Executada!! Novo Estoque: " + qtd_novo);
-            // } else {
-            //     alert("Quantidade Indisponível para venda")
-            // }
-        } else {
-            alert("Produto não encontrado!");
-        }
-    } else {
-        alert("Impossível Vender Valor negativo!")
-    }
-}
 
 async function buscar_cliente() {
     const busca = await fetch('http://localhost:3000/cliente')
@@ -379,7 +337,7 @@ async function buscar_produto() {
     produtos.push(...dados)
 }
 
-async function encontrar_cliente(){
+async function encontrar_cliente() {
     // buscar_cliente()
     const c = await clientes.find(item => item.cpfoucnpj === cpf.value)
     console.log(c)
@@ -403,9 +361,9 @@ async function editar_cliente() {
         }
         let resposta = await fetch(`http://localhost:3000/cliente/${c.cpfoucnpj}`, {
             method: "PUT",
-            headers: {"Content-Type":"application/json"},
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(cliente_atualizado)
-            })
+        })
     }
 
 }
@@ -417,12 +375,12 @@ async function deletar_cliente() {
     // let x = item.nome
     // console.log(item.nome)
     if (c) {
-        
+
         let resposta = await fetch(`http://localhost:3000/cliente/${c.cpfoucnpj}`, {
             method: "DELETE"
-            
-            })
-            // alert("deletei "+x)
+
+        })
+        // alert("deletei "+x)
     }
 
 }
