@@ -28,6 +28,10 @@ const dadosts = document.getElementById("teste")
 const vendas = JSON.parse(localStorage.getItem("vendas")) || []
 const nomev = document.getElementById("nomecv")
 const quantidadev = document.getElementById("quantidadecv")
+
+buscar_cliente()
+buscar_produto()
+
 //ABA DE RELATÓRIOS INICIO
 //PARTE DOS BOTÕES INICIO
 function cadcl() {
@@ -64,7 +68,7 @@ function relatorio() {
             function listarpdi() {
                 dadosrl.innerHTML = 'Relatório de Cadastro de Produtos'
                 for (let produto of produtos) {
-                    dadosrl.innerHTML += `<p><br>${i++}º => Nome do Produto: ${produto.nome}   ||   Quantidade: ${produto.quantidade}  || Valor Produto: ${produto.preco}</p>`
+                    dadosrl.innerHTML += `<p><br>${i++}º => Nome do Produto: ${produto.produto}   ||   Quantidade: ${produto.quantidade}  || Valor Produto: ${produto.preco} || Total em Estoque: R$${(produto.quantidade * produto.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>`
                 }
             }
             listarpdi()
@@ -84,14 +88,13 @@ function relatorio() {
         }
     }
 }
-relatorio()
 //PARTE DO INNER FIM
 //ABA DE RELATÓRIOS FIM
 //ABA DE CLIENTES INICIO
 async function cli() {
     if (nomec.value.trim() && cpf.value.trim() && rua.value.trim() && numero.value.trim() && uf.value.trim) {
         if (/^[A-Za-zÁ-ý\s]+$/.test(nomec.value)) {
-            if (/^\d{11}$/.test(cpf.value)) {
+            if (/^\d{11}$/.test(cpf.value) || /^\d{14}$/.test(cpf.value) || /^\d{18}$/.test(cpf.value)) {
                 let existe = false
                 for (let cliente of clientes) {
                     if (cliente.cpf == cpf.value)
@@ -100,18 +103,19 @@ async function cli() {
                 if (!existe) {
                     const cliente = {
                         nome: nomec.value,
-                        cpf: cpf.value,
+                        cpfoucnpj: cpf.value,
                         rua: rua.value,
                         numero: numero.value,
                         uf: uf.value
                     }
                     clientes.push(cliente)
 
-                    await fetch('http://localhost:3000/cliente',{
+                    await fetch('http://localhost:3000/cliente', {
                         method: 'POST',
-                        headers: {'Content-Type':'application/json'},
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(cliente)
                     })
+
                     localStorage.setItem("clientes", JSON.stringify(clientes))
 
                     alert("Cadastro Efetuado com Sucesso!!")
@@ -153,12 +157,12 @@ async function pro() {
                     }
                     produtos.push(produto)
 
-                    await fetch('http://localhost:3000/produto',{
+                    await fetch('http://localhost:3000/produto', {
                         method: 'POST',
-                        headers: {'Content-Type':'application/json'},
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(produto)
                     })
-                    
+
                     localStorage.setItem("produtos", JSON.stringify(produtos))
                     alert("Produto Cadastrado com sucesso!")
                 } else alert("Produto ja Cadastrado!")
@@ -188,7 +192,7 @@ function buscliente() {
     let existe = false
     let cliente = null
     for (let c of clientes) {
-        if (c.cpf == cpf.value) {
+        if (c.cpfoucnpj == cpf.value) {
             cliente = c
             existe = true
             break;
@@ -206,7 +210,7 @@ function buscliente() {
 function alterarcl() {
     let existe = false;
     for (let cliente of clientes) {
-        if (cliente.cpf === cpf.value) {
+        if (cliente.cpfoucnpj === cpf.value) {
             existe = true
             cliente.nome = nomec.value
             cliente.rua = rua.value
@@ -270,15 +274,15 @@ function venderpd() {
                 existe = true;
                 if (produto.quantidade > vlrsoma) {
 
-                produto.quantidade = produto.quantidade - vlrsoma
-                qtd_novo = produto.quantidade;
-                break;
+                    produto.quantidade = produto.quantidade - vlrsoma
+                    qtd_novo = produto.quantidade;
+                    break;
 
                 } else {
                     alert("Quantidade Indisponível para venda")
                     return;
                 }
-                
+
                 //
             }
         }
@@ -363,8 +367,63 @@ function xyz() {
 async function buscar_cliente() {
     const busca = await fetch('http://localhost:3000/cliente')
     const dados = await busca.json()
-    clientes.lenght = 0
+    clientes.length = 0
     clientes.push(...dados)
-    listarcli()
 }
-buscar_cliente()
+
+
+async function buscar_produto() {
+    const busca = await fetch('http://localhost:3000/produto')
+    const dados = await busca.json()
+    produtos.lenght = 0
+    produtos.push(...dados)
+}
+
+async function encontrar_cliente(){
+    // buscar_cliente()
+    const c = await clientes.find(item => item.cpfoucnpj === cpf.value)
+    console.log(c)
+    if (c) {
+        nomec.value = c.nome
+        cpf.value = c.cpfoucnpj
+        rua.value = c.rua
+        numero.value = c.numero
+        uf.value = c.uf
+    }
+}
+async function editar_cliente() {
+    const c = await clientes.find(item => item.cpfoucnpj === cpf.value)
+    if (c) {
+        let cliente_atualizado = {
+            nome: nomec.value ?? c.nome,
+            cpfoucnpj: cpf.value ?? c.cpfoucnpj,
+            numero: numero.value ?? c.numero,
+            rua: rua.value ?? c.rua,
+            uf: uf.value ?? c.uf
+        }
+        let resposta = await fetch(`http://localhost:3000/cliente/${c.cpfoucnpj}`, {
+            method: "PUT",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify(cliente_atualizado)
+            })
+    }
+
+}
+async function deletar_cliente() {
+
+    const c = await clientes.find(item => item.cpfoucnpj === cpf.value)
+    // const n = await clientes.find(item => item.cpfoucnpj === cpf.value)
+
+    // let x = item.nome
+    // console.log(item.nome)
+    if (c) {
+        
+        let resposta = await fetch(`http://localhost:3000/cliente/${c.cpfoucnpj}`, {
+            method: "DELETE"
+            
+            })
+            // alert("deletei "+x)
+    }
+
+}
+
